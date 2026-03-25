@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup Label="Globals">
+		<SccProjectName>SAK</SccProjectName>
+		<SccProvider>SAK</SccProvider>
+		<SccAuxPath>SAK</SccAuxPath>
+		<SccLocalPath>SAK</SccLocalPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp2.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Elite.Common.Utilities\**" />
+		<EmbeddedResource Remove="Elite.Common.Utilities\**" />
+		<None Remove="Elite.Common.Utilities\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.95.3" />
+		<PackageReference Include="FluentValidation" Version="8.0.100" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.8.11" />
+		<PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
+		<PackageReference Include="MediatR" Version="4.1.0" />
+		<PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Elite.AntiVirus.Services\Elite.AntiVirus.Lib.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Elite.Task.Microservice.CommonLib
+{
+    public enum NotificationActionType
+    {
+        ASSIGN_TO_RESPONSIBLE = 0,
+        OPEN_TO_COMPLETE = 1,
+        INPROGRESS_TO_COMPLETE = 2,
+        COMPLETE_TO_OPEN = 3,
+        COMPLETE_TO_INPROGRESS = 4,
+        CREATOR_OPEN_TO_COMPLETE = 5,
+        CREATOR_INPROGRESS_TO_COMPLETE = 6,
+        CREATOR_COMPLETE_TO_OPEN = 7,
+        CREATOR_COMPLETE_TO_INPROGRESS = 8,
+        TASK_TO_DELETE = 9,
+        SUBTASK_TO_DELETE = 10,
+		NOTIFY_OLD_RESPONSIBLE = 11,
+		ASSIGN_TO_CO_RESPONSIBLE = 12,
+		NOTIFY_OLD_CO_RESPONSIBLE = 13,
+        FROM_MEETING_ASSIGN_TO_RESPONSIBLE = 14,
+        FROM_MEETING_ASSIGN_TO_CO_RESPONSIBLE = 15,
+        REJECT_COMPLETE_INPROGRESS = 16,
+        FROM_MEETING_ASSIGN_TO_RESPONSIBLE_CORPORATE = 17,
+        FROM_MEETING_ASSIGN_TO_CO_RESPONSIBLE_CORPORATE = 18,
+    }
+}

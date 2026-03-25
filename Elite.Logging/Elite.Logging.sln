@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elite.Logging", "Elite.Logging\Elite.Logging.csproj", "{11032680-FC39-4C87-81B0-FF253EEE5E6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11032680-FC39-4C87-81B0-FF253EEE5E6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11032680-FC39-4C87-81B0-FF253EEE5E6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11032680-FC39-4C87-81B0-FF253EEE5E6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11032680-FC39-4C87-81B0-FF253EEE5E6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {492A1494-C83D-4616-B896-0AC187459631}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://sgscvaiw0308.in623.corpintra.net/tfs/elite
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Elite.Logging\\Elite.Logging.csproj
+		SccProjectName1 = Elite.Logging
+		SccLocalPath1 = Elite.Logging
+	EndGlobalSection
+EndGlobal

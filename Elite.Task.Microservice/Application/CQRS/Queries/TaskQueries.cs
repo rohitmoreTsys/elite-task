@@ -46,6 +46,7 @@ using Npgsql;
 namespace Elite_Task.Microservice.Application.CQRS.Queries
 {
     public class TaskQueries : BaseDataAccess, ITaskQueries
+
     {
         #region Variable declarations
 
@@ -83,7 +84,7 @@ namespace Elite_Task.Microservice.Application.CQRS.Queries
             _filtersServiceFactory = filtersServiceFactory;
             _filtersService = this._filtersServiceFactory(context.Database.GetDbConnection());
             _converter = converter;
-            InitializeUsers();
+            /// InitializeUsers();
             isEliteClassic = _configuration.GetSection("isEliteClassic").Get<bool>();
             _taskQueries = taskQueries;
         }
@@ -101,6 +102,7 @@ namespace Elite_Task.Microservice.Application.CQRS.Queries
         /// <returns></returns>
         public async Task<IList<QueriesTaskListDto>> GetTaskByPagination(int? page, int listType, TaskSearchKeywords searchKeywords, HttpResponse response, FilterActionEnum topicFilterAction)
         {
+            await InitializeUsersAsync();
             try
             {
                 ITaskRolesAndRightFilterBuilder<EliteTask> rolesBuilder = TaskRolesAndRightsFilterFactory.GetTaskRolesAndRightsFilterObject(topicFilterAction, this.rolesPermissions.UserRolesAndRights, this._requestContext, isEliteClassic);
@@ -509,13 +511,19 @@ namespace Elite_Task.Microservice.Application.CQRS.Queries
             return null;
         }
 
-        private void InitializeUsers()
+        private bool _isInitialized = false;
+
+        private async Task InitializeUsersAsync()
         {
-            Task.Run(async () =>
-            {
-                this._UID = this._requestContext.IsDeputy ? _requestContext.DeputyUID.Upper() : _requestContext.UID.Upper();
-                this.committees = await _userService.GetCommitees();
-            }).Wait();
+            if (_isInitialized) return;  // ✅ prevents repeated calls
+
+            this._UID = this._requestContext.IsDeputy
+            ? _requestContext.DeputyUID?.ToUpper()
+            : _requestContext.UID?.ToUpper();
+
+            this.committees = await _userService.GetCommitees();
+
+            _isInitialized = true; // ✅ mark as initialized
         }
 
         private QueriesTaskAttachmentDto GetAttachment(TaskAttachmentMapping topicsAttachment)

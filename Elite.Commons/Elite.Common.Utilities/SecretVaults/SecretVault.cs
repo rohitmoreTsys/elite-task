@@ -19,12 +19,9 @@ namespace Elite.Common.Utilities.SecretVault
         private static readonly IAppCache appCache = new CachingService();
 
         private SecretVault()
-        {   
-            if (!appCache.TryGetValue<string>("token", out string token))
-            {
-                _clientToken = GetVaultToken().Result;
-                AddValueToCache("token", _clientToken);
-            }
+        {
+              // DO NOT call Vault here
+            _clientToken = null;
         }
 
         private void AddValueToCache(string key, string value)
@@ -35,24 +32,34 @@ namespace Elite.Common.Utilities.SecretVault
 
         private string GetValueFromCache(string key)
         {
-            if (appCache != null)
-                return appCache.Get<string>(key);
-            else
-            {
-                if (string.Compare("token", key) == 0)
-                {
-                    return GetVaultToken().Result;
-                }
-            }
-            return string.Empty;
+            if (appCache != null && appCache.TryGetValue<string>(key, out var cachedValue))
+        {
+            return cachedValue;
         }
+       if (string.Compare("token", key) == 0)
+    {
+        if (string.IsNullOrEmpty(_clientToken))
+        {
+            _clientToken = GetVaultToken().GetAwaiter().GetResult();
+            AddValueToCache("token", _clientToken);
+        }
+        return _clientToken;
+    }
+
+    return string.Empty;
+}
 
         public string GetValuesFromVault(string key)
         {
             var valuefromCache = GetValueFromCache(key);
             if (string.IsNullOrEmpty(valuefromCache))
             {
-                HttpClient httpClient = new HttpClient();
+                var handler = new HttpClientHandler
+               {
+                   ServerCertificateCustomValidationCallback =
+                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+               };
+                HttpClient httpClient = new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Add("X-Vault-Request", "true");
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + GetValueFromCache("token"));
                 var response = httpClient.GetAsync(Environment.GetEnvironmentVariable("VaultUrl")).Result;
@@ -71,7 +78,13 @@ namespace Elite.Common.Utilities.SecretVault
             if (string.IsNullOrEmpty(valuefromCache))
             {
                 var vaultPath = Environment.GetEnvironmentVariable(key);
-                HttpClient httpClient = new HttpClient();
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback =
+                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+
+                HttpClient httpClient = new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Add("X-Vault-Request", "true");
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + GetValueFromCache("token"));
                 //Getting vault data from Custom Vault
@@ -86,8 +99,13 @@ namespace Elite.Common.Utilities.SecretVault
 
         public async Task<string> GetVaultToken()
         {
-            HttpClient httpClient = new HttpClient();
+            var handler = new HttpClientHandler
+          {
+               ServerCertificateCustomValidationCallback =
+                 HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+          };
 
+            HttpClient httpClient = new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Add("X-Vault-Request", "true");
 
             string vaultPassword = Encoding.UTF8.GetString(Convert.FromBase64String("ZUxpdGVEYWltbGVyJA=="));

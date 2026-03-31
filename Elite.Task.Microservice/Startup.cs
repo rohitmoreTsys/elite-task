@@ -56,15 +56,38 @@ namespace Elite_Task.Microservice
             services.AddEntityFrameworkNpgsql()
               .AddDbContext<EliteTaskContext>(opt =>
               {
-                  opt.UseNpgsql(secretVault.GetValuesFromVault("eliteTaskConnectionString"), NpgsqlOptionsAction: sqlOption =>
+                   var envConn = Configuration.GetConnectionString("eliteTaskConnectionString"); 
+
+                   var connectionString = !string.IsNullOrEmpty(envConn)
+                        ? envConn
+                        : secretVault.GetValuesFromVault("eliteTaskConnectionString");
+
+                   Console.WriteLine("EliteTask DB Source: " + 
+                      (!string.IsNullOrEmpty(envConn) ? "ENV" : "VAULT"));
+
+                   opt.UseNpgsql(connectionString, sqlOption =>
                   {
-                      sqlOption.MigrationsAssembly(typeof(Startup).Assembly.GetName().Name);
-                      sqlOption.EnableRetryOnFailure(maxRetryCount: 3,
-                          maxRetryDelay: TimeSpan.FromSeconds(10), errorCodesToAdd: null);
+                     sqlOption.MigrationsAssembly(typeof(Startup).Assembly.GetName().Name);
+                     sqlOption.EnableRetryOnFailure(
+                     maxRetryCount: 3,
+                     maxRetryDelay: TimeSpan.FromSeconds(10),
+                     errorCodesToAdd: null);
                   });
               },
               ServiceLifetime.Scoped)
-              .AddDbContext<EliteLoggerContext>(options => options.UseNpgsql(secretVault.GetValuesFromVault("eliteLogDbConnection"))); ;
+              .AddDbContext<EliteLoggerContext>(options =>
+              {
+                   var envConn = Configuration.GetConnectionString("eliteLogDbConnection");
+
+                  var connectionString = !string.IsNullOrEmpty(envConn)
+                   ? envConn
+                   : secretVault.GetValuesFromVault("eliteLogDbConnection");
+
+                 Console.WriteLine("EliteLogger DB Source: " +
+                    (!string.IsNullOrEmpty(envConn) ? "ENV" : "VAULT"));
+
+                 options.UseNpgsql(connectionString);
+              });	 ;
 
             services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
@@ -158,7 +181,7 @@ namespace Elite_Task.Microservice
                 app.Use(async (context, next) =>
                 {
                     context.Response.Headers.Add("Strict-Transport-Security", "max-age=15724800; includeSubDomains");
-                    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self';");
+                    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'");
                     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
                     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
                     context.Response.Headers.Add("X-Frame-Options", "DENY"); await next();
@@ -166,14 +189,24 @@ namespace Elite_Task.Microservice
             }
             app.UseCors("AllowAllHeaders");
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseForwardedHeaders();
+
+            app.Use((context, next) =>
+            {
+                 context.Request.Scheme = "https";
+                 return next();
+            });
+
+            app.UseStaticFiles();
+
             app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "TASK MICROSERVICE API");
+                c.RoutePrefix = "swagger";
             });
+
             app.UseAuthentication();
             app.UseMvc();
         }
